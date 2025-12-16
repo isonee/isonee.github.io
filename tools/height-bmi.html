@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Height Converter — cm ⇄ ft & in</title>
+  <style>
+    :root{
+      --bg:#041022;--card:#071129;--muted:#9eaec0;
+      --accent:#7c3aed;--accent2:#06b6d4;
+      --glass:rgba(255,255,255,.03);--max-width:520px;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:14px;background:linear-gradient(180deg,#03131a 0%,#041022 100%);color:#e6eef8}
+    .card{width:100%;max-width:var(--max-width);background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,.04);backdrop-filter:blur(6px);box-shadow:0 14px 36px rgba(2,6,23,.6)}
+    .head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px}
+    h1{margin:0;font-size:18px}
+    .lead{margin:2px 0 0;font-size:13px;color:var(--muted)}
+    .theme-btn{margin-left:auto;background:transparent;border:0;color:var(--muted);font-size:20px;cursor:pointer}
+    .stack{display:flex;flex-direction:column;gap:10px}
+    .panel{background:var(--glass);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.03)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+    input[type=number]{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:transparent;color:inherit;font-size:20px;min-height:56px;outline:none}
+    input::placeholder{color:#95a4b5}
+    .ftin{display:flex;gap:10px}
+    .ftin>div{flex:1;min-width:0}
+    .unit{font-size:12px;color:var(--muted);margin-top:8px}
+    .result{text-align:center;font-size:20px;padding:8px}
+    .footer-panel{font-size:12px;color:var(--muted);text-align:center}
+    .footer-panel a{color:var(--accent2);text-decoration:none}
+
+    body.light{background:#f3f4f6;color:#111}
+    body.light .card{background:#fff;color:#111;border-color:#d0d0d0;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+    body.light .panel{background:#fafafa;border-color:#e2e2e2}
+    body.light input[type=number]{background:#fff;border-color:#ccc;color:#111}
+    body.light .theme-btn{color:#444}
+
+    @media(max-width:420px){.logo{display:none}.ftin{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <div class="head">
+      <div class="logo">Ht</div>
+      <div>
+        <h1>Height converter</h1>
+        <div class="lead">Simple cm ⇄ ft/in conversion</div>
+      </div>
+      <button id="themeToggle" class="theme-btn">🌙</button>
+    </div>
+
+    <div class="stack">
+      <div class="panel">
+        <label for="cm">Centimetres (cm)</label>
+        <input id="cm" type="number" placeholder="e.g. 172.5" />
+        <div class="unit">1 in = 2.54 cm • 1 ft = 12 in</div>
+      </div>
+
+      <div class="panel">
+        <label>Feet & inches</label>
+        <div class="ftin">
+          <div><input id="ft" type="number" placeholder="ft" /><div class="unit">Feet</div></div>
+          <div><input id="inch" type="number" placeholder="in" /><div class="unit">Inches</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <label for="weight">Weight (kg)</label>
+        <input id="weight" type="number" placeholder="e.g. 65" />
+      </div>
+
+      <div class="panel">
+        <label>BMI</label>
+        <div id="result" class="result">Enter weight for BMI</div>
+      </div>
+
+      <div class="panel footer-panel">
+        © Copyright. For any custom app development, please
+        <a href="mailto:avinash.sonee@gmail.com">contact</a>.<br />
+        <span style="font-size:11px;opacity:.9">Made by <strong>iSonee</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cm=document.getElementById('cm'),ft=document.getElementById('ft'),inch=document.getElementById('inch'),kg=document.getElementById('weight'),res=document.getElementById('result'),theme=document.getElementById('themeToggle');
+    let lock=false;
+    function fromCm(){if(lock)return;lock=true;const v=parseFloat(cm.value);if(isNaN(v)){ft.value='';inch.value='';lock=false;return;}const t=v/2.54,f=Math.floor(t/12),i=+(t%12).toFixed(1);ft.value=f;inch.value=i;updateBMI(v);lock=false}
+    function fromFtIn(){if(lock)return;lock=true;const f=parseFloat(ft.value)||0,i=parseFloat(inch.value)||0,v=+(((f*12)+i)*2.54).toFixed(1);cm.value=v;updateBMI(v);lock=false}
+    function updateBMI(v){const w=parseFloat(kg.value);if(!isNaN(w)&&w>0&&!isNaN(v)){const m=v/100,b=+(w/(m*m)).toFixed(1);let c='var(--accent)';if(b<18.5)c='#f59e0b';else if(b>=25)c='#ef4444';res.innerHTML=`BMI: <strong style="color:${c}">${b}</strong>`}else res.textContent='Enter weight for BMI'}
+    cm.addEventListener('input',fromCm);ft.addEventListener('input',fromFtIn);inch.addEventListener('input',fromFtIn);kg.addEventListener('input',()=>{const v=parseFloat(cm.value);if(!isNaN(v))updateBMI(v)});
+    theme.addEventListener('click',()=>{document.body.classList.toggle('light');theme.textContent=document.body.classList.contains('light')?'☀️':'🌙'});
+  </script>
+</body>
+</html>
