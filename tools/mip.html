@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<title>A4 Multi-Up</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%;
+  font-family: system-ui, sans-serif;
+  background: #f0f2f5;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Top bar */
+#topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  width: 100%;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#topbar button, #topbar label, #topbar select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  background: #6366f1;
+}
+
+#topbar {
+  position: relative;
+  z-index: 10;
+}
+
+#png { background: #4f46e5; }
+#pdf { background: #0ea5e9; }
+#print { background: #059669; }
+#rowsSel { color:#000; background:#e5e7eb; }
+
+#fileInput { display: none; }
+
+/* Canvas wrap */
+#wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  padding: 10px;
+}
+
+#holder {
+  position: relative;
+}
+
+canvas {
+  background: #fff;
+  box-shadow: 0 0 12px rgba(0,0,0,0.35);
+}
+
+canvas {
+  pointer-events: auto;
+}
+
+
+/* On-canvas controls */
+.ctrl {
+  position: absolute;
+  left: 8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: rgba(0,0,0,0.55);
+  padding: 4px 6px;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.ctrl input { width: 70px; }
+.ctrl button {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.9);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+
+
+/* First ctrl: hide ▲ */
+.ctrl:first-of-type button:nth-of-type(1) {
+  display: none;
+}
+
+/* Last ctrl: hide ▼ */
+.ctrl:last-of-type button:nth-of-type(2) {
+  display: none;
+}
+
+
+/* Show controls on hover (desktop) */
+#holder:hover .ctrl {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Always show on touch devices */
+@media (hover: none) {
+  .ctrl {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff;
+  }
+
+  #topbar, .ctrl, #footer {
+    display: none !important;
+  }
+
+  #wrap, #holder {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  canvas {
+    width: 210mm !important;
+    height: 297mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: block;
+  }
+}
+
+@media print {
+  #topbar, .ctrl, #footer { display: none !important; }
+  body { background: #fff; }
+
+  canvas {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+  }
+}
+
+
+
+#footer {
+  font-size: 12px;
+  color: #666;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+#footer a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+#footer a:hover {
+  text-decoration: underline;
+}
+
+@media print {
+  #footer { display: none !important; }
+}
+
+
+</style>
+<script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Br Vr ci Wr Jr zr qr capture Ni calculateEventProperties Xr register register_once register_for_session unregister unregister_for_session es getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Zr Yr createPersonProfile ts Nr rs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Kr debug O Qr getPageViewId captureTraceFeedback captureTraceMetric Dr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_Mzs45fJEGFmFkn1n5yaluv9KwvCEcoGHb2Ww7usDlWn', {
+        api_host: 'https://eu.i.posthog.com',
+        defaults: '2025-11-30',
+        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+    })
+</script>
+</head>
+<body>
+
+<div id="topbar">
+  <label>
+    Pick Images
+    <input id="fileInput" type="file" accept="image/*" multiple>
+  </label>
+  <select id="rowsSel">
+    <option value="2">2-up</option>
+    <option value="3" selected>3-up</option>
+  </select>
+<button id="png" type="button">Export JPG</button>
+<button id="pdf" type="button">Export PDF</button>
+<button id="printBtn" type="button">Print</button>
+
+
+</div>
+
+<div id="wrap">
+  <div id="holder">
+    <canvas id="canvas"></canvas>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const { jsPDF } = window.jspdf;
+
+/* True A4 @ 300 DPI */
+const A4_W = 1984, A4_H = 2806, M = 60;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = A4_W;
+canvas.height = A4_H;
+
+const holder = document.getElementById('holder');
+
+let rows = 3;
+let images = [];
+let scales = [];
+let ctrls = [];
+let targetSlot = 0;
+let isPrinting = false;
+
+canvas.onclick = e => {
+  const rect = canvas.getBoundingClientRect();
+  const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+  const usableH = A4_H - 2 * M;
+  const slotH = usableH / rows;
+  const i = Math.floor((y - M) / slotH);
+
+  if (i >= 0 && i < rows) {
+    targetSlot = i;
+    fileInput.click();
+  }
+};
+
+
+/* Init dynamic rows */
+function initRows(n) {
+  rows = n;
+  images = Array(n).fill(null);
+  scales = Array(n).fill(1);
+
+  ctrls.forEach(c => c.remove());
+  ctrls = [];
+
+  for (let i = 0; i < rows; i++) {
+    const d = document.createElement('div');
+    d.className = 'ctrl';
+    d.innerHTML = `
+      <input type="range" min="0.5" max="2" step="0.01" value="1">
+      <button>▲</button>
+      <button>▼</button>`;
+    holder.appendChild(d);
+
+    const [range, up, down] = d.children;
+    range.oninput = e => { scales[i] = +e.target.value; draw(); };
+    up.onclick = () => { if (i > 0) swap(i, i - 1); };
+    down.onclick = () => { if (i < rows - 1) swap(i, i + 1); };
+
+    ctrls.push(d);
+  }
+  draw();
+}
+
+/* Swap slots */
+function swap(i,j){
+  [images[i],images[j]]=[images[j],images[i]];
+  [scales[i],scales[j]]=[scales[j],scales[i]];
+  ctrls[i].querySelector('input').value = scales[i];
+  ctrls[j].querySelector('input').value = scales[j];
+  draw();
+}
+
+/* Auto fit to screen */
+function fit() {
+  const topH = document.getElementById('topbar').offsetHeight;
+  const availW = window.innerWidth - 20;
+  const availH = window.innerHeight - topH - 20;
+
+  const s = Math.min(availW / A4_W, availH / A4_H);
+
+  canvas.style.width = A4_W * s + 'px';
+  canvas.style.height = A4_H * s + 'px';
+
+  const usableH = A4_H - 2 * M;
+  const slotH = usableH / rows;
+
+ ctrls.forEach((c, i) => {
+  c.style.top = (M + i * slotH + 10) * s + 'px';
+  c.style.display = images[i] ? 'flex' : 'none';
+});
+
+}
+window.onresize = fit;
+
+/* Draw */
+function draw() {
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0,0,A4_W,A4_H);
+  ctx.strokeStyle="#eee";
+  ctx.lineWidth=2;
+
+  const usableW = A4_W - 2 * M;
+  const usableH = A4_H - 2 * M;
+  const slotH = usableH / rows;
+
+  for (let i = 0; i < rows; i++) {
+    const x = M;
+    const y = M + i * slotH;
+	
+	
+
+    if (!isPrinting) {
+  ctx.strokeRect(x, y, usableW, slotH);
+}
+
+
+    const img = images[i];
+    if (img) {
+      const base = Math.min(usableW / img.width, slotH / img.height);
+      const s = base * scales[i];
+      const w = img.width * s;
+      const h = img.height * s;
+      const dx = x + (usableW - w) / 2;
+      const dy = y + (slotH - h) / 2;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, usableW, slotH);
+      ctx.clip();
+      ctx.drawImage(img, dx, dy, w, h);
+      ctx.restore();
+    } else {
+  ctx.fillStyle = "#888";
+ctx.font = "42px sans-serif";   // 👈 bigger
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+ctx.fillText(
+  "Tap / Click to add image",
+  x + usableW / 2,
+  y + slotH / 2
+);
+
+}
+  }
+  fit();
+}
+initRows(3);
+
+/* File picker */
+fileInput.onchange = e => {
+  const files = [...e.target.files];
+
+  // how many slots are available from targetSlot
+  const max = rows - targetSlot;
+
+  files.slice(0, max).forEach((f, idx) => {
+    load(f, targetSlot + idx);
+  });
+
+  e.target.value = ''; // reset so same file can be picked again
+};
+
+
+/* Drag & drop (desktop) */
+canvas.ondragover = e => e.preventDefault();
+canvas.ondrop = e => {
+  e.preventDefault();
+  [...e.dataTransfer.files].slice(0, rows).forEach((f,i)=>load(f,i));
+};
+
+function load(file,i){
+  const img = new Image();
+  img.onload = () => {
+    images[i] = img;
+    scales[i] = 1;
+    ctrls[i].querySelector('input').value = 1;
+    draw();
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+/* Export JPG */
+png.onclick = () => {
+  const a = document.createElement('a');
+  a.download = 'a4-multiup.jpg';
+  a.href = canvas.toDataURL('image/jpeg', 0.9);
+  a.click();
+};
+
+/* Export PDF (compressed) */
+pdf.onclick = () => {
+  const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+  const img = canvas.toDataURL('image/jpeg', 0.85);
+  pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
+  pdf.save('a4-multiup.pdf');
+};
+
+/* Reliable print */
+const printBtn = document.getElementById('printBtn');
+
+printBtn.addEventListener('click', () => {
+  isPrinting = true;
+  draw();
+
+  setTimeout(() => {
+    window.print();
+
+    setTimeout(() => {
+      isPrinting = false;
+      draw();
+    }, 500);
+  }, 50);
+});
+
+
+
+
+/* Rows selector */
+rowsSel.onchange = e => initRows(+e.target.value);
+</script>
+
+</body>
+<footer id="footer">
+  © 2025 · For any custom app development, please <a href="mailto:avinash.sonee@gmail.com">contact</a>
+</footer>
+
+</html>
