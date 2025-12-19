@@ -414,10 +414,18 @@ function load(file,i){
   img.src = URL.createObjectURL(file);
 }
 
+function timestamp() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_` +
+         `${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+}
+
+
 /* Export JPG */
 png.onclick = () => {
   const a = document.createElement('a');
-  a.download = 'a4-multiup.jpg';
+  a.download = `a4-multiup-${timestamp()}.jpg`;
   a.href = canvas.toDataURL('image/jpeg', 0.9);
   a.click();
 };
@@ -427,7 +435,7 @@ pdf.onclick = () => {
   const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
   const img = canvas.toDataURL('image/jpeg', 0.85);
   pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
-  pdf.save('a4-multiup.pdf');
+  pdf.save(`a4-multiup-${timestamp()}.pdf`);
 };
 
 /* Reliable print */
