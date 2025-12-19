@@ -18,10 +18,11 @@ body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background: linear-gradient(180deg, #020617, #0f172a);
   color: var(--text);
-  min-height: 100vh;
+  min-height: 100svh; /* mobile-safe viewport */
   display: flex;
   flex-direction: column;
 }
+
 header {
   padding: 1.2rem 1rem;
   text-align: center;
@@ -37,12 +38,13 @@ header p {
 }
 
 main {
-  flex: 1;
+  flex: 1 0 auto;
   padding: 1rem;
   max-width: 900px;
   margin: auto;
   width: 100%;
 }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -96,6 +98,10 @@ footer a {
 footer a:hover {
   text-decoration: underline;
 }
+footer {
+  flex-shrink: 0;
+}
+
 
 .coming-soon {
   text-align: center;
