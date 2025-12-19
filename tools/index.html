@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini Utilities Hub</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --card: #111827;
+  --accent: #6366f1;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: linear-gradient(180deg, #020617, #0f172a);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+header p {
+  margin: .4rem 0 0;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+main {
+  flex: 1;
+  padding: 1rem;
+  max-width: 900px;
+  margin: auto;
+  width: 100%;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(0,0,0,.45);
+}
+.card h3 {
+  margin: 0 0 .4rem;
+  font-size: 1.1rem;
+}
+.card p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.card a {
+  align-self: flex-start;
+  text-decoration: none;
+  color: white;
+  background: var(--accent);
+  padding: .5rem .9rem;
+  border-radius: 10px;
+  font-size: .9rem;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: .85rem;
+  color: var(--muted);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+footer a {
+  color: #a5b4fc;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+
+.coming-soon {
+  text-align: center;
+  margin-top: 1.2rem;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  header h1 { font-size: 1.3rem; }
+  .card { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧰 Mini Utilities Hub</h1>
+  <p>Handy little tools for everyday use</p>
+</header>
+
+<main>
+  <div class="grid">
+    <div class="card">
+      <div>
+        <h3>Height Converter & BMI</h3>
+        <p>Convert cm ⇄ ft/in and instantly calculate BMI.</p>
+      </div>
+      <a href="height-bmi.html">Open Tool</a>
+    </div>
+
+    <div class="card">
+      <div>
+        <h3>Multi Image Print (A4)</h3>
+        <p>Arrange multiple images and print/export on an A4 sheet.</p>
+      </div>
+      <a href="a4-image-print.html">Open Tool</a>
+    </div>
+
+   <p class="coming-soon">
+  🚀 More tools coming soon…
+</p>
+
+  </div>
+</main>
+
+<footer>
+  © 2025 Mini Utilities |
+  Need a custom tool?  
+  <a href="mailto:avinash.sonee@gmail.com?subject=Custom%20Utility%20Request">
+    Contact us
+  </a>
+</footer>
+
+</body>
+</html>
